@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove AI - إزالة الخلفيات بالذكاء الاصطناعي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <div class="logo-text">Remove AI</div>
+            </div>
+            
+            <p class="subtitle">أزل خلفية أي صورة بضغطة واحدة باستخدام الذكاء الاصطناعي</p>
+        </div>
+
+        <div class="main-card">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <div class="upload-text">اسحب وأفلت صورتك هنا</div>
+                <div class="upload-subtext">أو انقر لاختيار ملف (JPG, PNG, WEBP)</div>
+                <input type="file" class="file-input" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="image-container" id="imageContainer">
+                <div class="image-preview" id="imagePreview">
+                    <img id="originalImage" alt="الصورة الأصلية">
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="removeBtn">
+                        <i class="fas fa-magic"></i>
+                        إزالة الخلفية
+                    </button>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">جاري معالجة الصورة بالذكاء الاصطناعي...</div>
+            </div>
+
+            <div class="comparison-container" id="comparisonContainer">
+                <div class="comparison-slider" id="comparisonSlider">
+                    <div class="comparison-images">
+                        <img id="beforeImage" alt="قبل" class="before-image">
+                        <img id="afterImage" alt="بعد" class="after-image">
+                    </div>
+                    <div class="slider-handle" id="sliderHandle"></div>
+                </div>
+                <div class="slider-labels">
+                    <span class="label-before">الأصلية</span>
+                    <span class="label-after">بعد الإزالة</span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="downloadBtn">
+                        <i class="fas fa-download"></i>
+                        تحميل الصورة
+                    </button>
+                    <button class="btn btn-secondary" id="newImageBtn">
+                        <i class="fas fa-plus"></i>
+                        صورة جديدة
+                    </button>
+                </div>
+            </div>
+
+            <div class="sample-images">
+                <div class="sample-title">أو جرب إحدى هذه الصور:</div>
+                <div class="sample-grid">
+                    <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop" 
+                         alt="عينة 1" class="sample-image" data-sample="1">
+                    <img src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop" 
+                         alt="عينة 2" class="sample-image" data-sample="2">
+                    <img src="https://images.pexels.com/photos/1674752/pexels-photo-1674752.jpg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop" 
+                         alt="عينة 3" class="sample-image" data-sample="3">
+                    <img src="https://images.pexels.com/photos/1040880/pexels-photo-1040880.jpg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop" 
+                         alt="عينة 4" class="sample-image" data-sample="4">
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <i class="fas fa-bolt feature-icon"></i>
+                <div class="feature-title">سرعة فائقة</div>
+                <div class="feature-description">معالجة الصور في ثوانٍ معدودة باستخدام أحدث تقنيات الذكاء الاصطناعي</div>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <div class="feature-title">آمن ومحمي</div>
+                <div class="feature-description">جميع العمليات تتم محلياً في متصفحك، صورك لا تغادر جهازك أبداً</div>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-star feature-icon"></i>
+                <div class="feature-title">جودة عالية</div>
+                <div class="feature-description">نتائج احترافية بدقة عالية مع الحفاظ على تفاصيل الصورة</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
