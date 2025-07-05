@@ -118,9 +118,35 @@ body {
 .subtitle {
     font-size: 1.2rem;
     color: var(--text-gray);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     opacity: 0;
     animation: fadeInUp 1s ease forwards 0.5s;
+}
+
+.designer-credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: fadeInUp 1s ease forwards 0.8s;
+}
+
+.designer-credit:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.designer-credit i {
+    font-size: 14px;
+    color: var(--accent);
 }
 
 @keyframes fadeInUp {
@@ -515,6 +541,66 @@ body {
     border-color: var(--primary);
 }
 
+.footer {
+    margin-top: 60px;
+    padding: 30px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.footer-logo i {
+    font-size: 20px;
+    color: var(--accent);
+}
+
+.footer-credit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.footer-credit i {
+    color: var(--primary);
+}
+
+.footer-credit strong {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+}
+
+.footer-year {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.footer-year i {
+    color: var(--secondary);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 15px;
@@ -555,6 +641,17 @@ body {
     .features {
         grid-template-columns: 1fr;
     }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .designer-credit {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
 }
 
 .dark-mode .main-card,
@@ -570,4 +667,13 @@ body {
 
 .dark-mode .upload-area:hover {
     border-color: var(--primary);
+}
+
+.dark-mode .designer-credit {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .footer {
+    border-top-color: rgba(255, 255, 255, 0.05);
 }
