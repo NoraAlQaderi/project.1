@@ -1,14 +1,14 @@
 {
-  "name": "remove-images-background",
+  "name": "remove-images-videos-background",
   "version": "1.0.0",
-  "description": "تطبيق Remove Images Background لإزالة الخلفيات بالذكاء الاصطناعي",
+  "description": "تطبيق Remove Images & Videos Background لإزالة الخلفيات بالذكاء الاصطناعي",
   "main": "index.html",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": ["ai", "background-removal", "image-processing", "remove-background"],
+  "keywords": ["ai", "background-removal", "image-processing", "video-processing", "remove-background"],
   "author": "Nora Al_Qaderi",
   "license": "ISC",
   "devDependencies": {

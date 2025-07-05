@@ -1,25 +1,53 @@
 // العناصر الأساسية
 const uploadArea = document.getElementById('uploadArea');
 const fileInput = document.getElementById('fileInput');
-const imageContainer = document.getElementById('imageContainer');
+const fileContainer = document.getElementById('fileContainer');
 const originalImage = document.getElementById('originalImage');
+const originalVideo = document.getElementById('originalVideo');
 const removeBtn = document.getElementById('removeBtn');
 const loading = document.getElementById('loading');
 const comparisonContainer = document.getElementById('comparisonContainer');
 const beforeImage = document.getElementById('beforeImage');
 const afterImage = document.getElementById('afterImage');
+const beforeVideo = document.getElementById('beforeVideo');
+const afterVideo = document.getElementById('afterVideo');
 const downloadBtn = document.getElementById('downloadBtn');
-const newImageBtn = document.getElementById('newImageBtn');
+const newFileBtn = document.getElementById('newFileBtn');
 const themeToggle = document.getElementById('themeToggle');
-const sampleImages = document.querySelectorAll('.sample-image');
+const sampleItems = document.querySelectorAll('.sample-item');
 const sliderHandle = document.getElementById('sliderHandle');
 const comparisonSlider = document.getElementById('comparisonSlider');
+
+// عناصر التبويبات والنصوص
+const tabBtns = document.querySelectorAll('.tab-btn');
+const uploadIcon = document.getElementById('uploadIcon');
+const uploadText = document.getElementById('uploadText');
+const uploadSubtext = document.getElementById('uploadSubtext');
+const removeBtnText = document.getElementById('removeBtnText');
+const downloadBtnText = document.getElementById('downloadBtnText');
+const newFileBtnText = document.getElementById('newFileBtnText');
+const loadingText = document.getElementById('loadingText');
+const sampleTitle = document.getElementById('sampleTitle');
+const imageComparison = document.getElementById('imageComparison');
+const videoComparison = document.getElementById('videoComparison');
+
+// عناصر معلومات الملف
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const videoDuration = document.getElementById('videoDuration');
+const duration = document.getElementById('duration');
+
+// عناصر شريط التقدم
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
 
 // مفتاح API لحذف الخلفية
 const API_KEY = 'zK811CojSrKBDMmXPgB1SyYv';
 
-let currentImageFile = null;
-let processedImageData = null;
+let currentFileType = 'image'; // image أو video
+let currentFile = null;
+let processedFileData = null;
 
 // التبديل بين الوضع الداكن والفاتح
 themeToggle.addEventListener('click', () => {
@@ -36,6 +64,46 @@ themeToggle.addEventListener('click', () => {
         localStorage.setItem('theme', 'light');
     }
 });
+
+// التبديل بين تبويبات نوع الملف
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        // إزالة الفئة النشطة من جميع الأزرار
+        tabBtns.forEach(b => b.classList.remove('active'));
+        // إضافة الفئة النشطة للزر المحدد
+        btn.classList.add('active');
+        
+        const type = btn.dataset.type;
+        currentFileType = type;
+        
+        updateUIForFileType(type);
+        resetApplication();
+    });
+});
+
+function updateUIForFileType(type) {
+    if (type === 'image') {
+        uploadIcon.className = 'fas fa-cloud-upload-alt upload-icon';
+        uploadText.textContent = 'اسحب وأفلت صورتك هنا';
+        uploadSubtext.textContent = 'أو انقر لاختيار ملف (JPG, PNG, WEBP)';
+        fileInput.accept = 'image/*';
+        removeBtnText.textContent = 'إزالة الخلفية';
+        downloadBtnText.textContent = 'تحميل الصورة';
+        newFileBtnText.textContent = 'صورة جديدة';
+        loadingText.textContent = 'جاري معالجة الصورة بالذكاء الاصطناعي...';
+        sampleTitle.textContent = 'أو جرب إحدى هذه الصور:';
+    } else {
+        uploadIcon.className = 'fas fa-video upload-icon';
+        uploadText.textContent = 'اسحب وأفلت فيديوك هنا';
+        uploadSubtext.textContent = 'أو انقر لاختيار ملف (MP4, MOV, AVI)';
+        fileInput.accept = 'video/*';
+        removeBtnText.textContent = 'إزالة خلفية الفيديو';
+        downloadBtnText.textContent = 'تحميل الفيديو';
+        newFileBtnText.textContent = 'فيديو جديد';
+        loadingText.textContent = 'جاري معالجة الفيديو بالذكاء الاصطناعي...';
+        sampleTitle.textContent = 'أو جرب إحدى هذه الفيديوهات:';
+    }
+}
 
 // رفع الملفات
 uploadArea.addEventListener('click', () => fileInput.click());
@@ -71,73 +139,148 @@ function handleFileSelect(e) {
 }
 
 function handleFile(file) {
-    if (!file.type.startsWith('image/')) {
+    // التحقق من نوع الملف
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    
+    if (currentFileType === 'image' && !isImage) {
         showNotification('يرجى اختيار ملف صورة صحيح', 'error');
         return;
     }
-
-    if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        showNotification('حجم الملف كبير جداً. يرجى اختيار صورة أصغر من 10 ميجابايت', 'error');
+    
+    if (currentFileType === 'video' && !isVideo) {
+        showNotification('يرجى اختيار ملف فيديو صحيح', 'error');
         return;
     }
 
-    currentImageFile = file;
+    // التحقق من حجم الملف
+    const maxSize = currentFileType === 'image' ? 10 * 1024 * 1024 : 100 * 1024 * 1024; // 10MB للصور، 100MB للفيديو
+    if (file.size > maxSize) {
+        const sizeText = currentFileType === 'image' ? '10 ميجابايت' : '100 ميجابايت';
+        showNotification(`حجم الملف كبير جداً. يرجى اختيار ${currentFileType === 'image' ? 'صورة' : 'فيديو'} أصغر من ${sizeText}`, 'error');
+        return;
+    }
+
+    currentFile = file;
+    displayFile(file);
+    updateFileInfo(file);
+}
+
+function displayFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        originalImage.src = e.target.result;
-        imageContainer.style.display = 'block';
+        if (currentFileType === 'image') {
+            originalImage.src = e.target.result;
+            originalImage.style.display = 'block';
+            originalVideo.style.display = 'none';
+        } else {
+            originalVideo.src = e.target.result;
+            originalVideo.style.display = 'block';
+            originalImage.style.display = 'none';
+            
+            // الحصول على مدة الفيديو
+            originalVideo.addEventListener('loadedmetadata', () => {
+                const minutes = Math.floor(originalVideo.duration / 60);
+                const seconds = Math.floor(originalVideo.duration % 60);
+                duration.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                videoDuration.style.display = 'flex';
+            });
+        }
+        
+        fileContainer.style.display = 'block';
         comparisonContainer.style.display = 'none';
-        showNotification('تم تحميل الصورة بنجاح!', 'success');
+        showNotification(`تم تحميل ${currentFileType === 'image' ? 'الصورة' : 'الفيديو'} بنجاح!`, 'success');
     };
     reader.readAsDataURL(file);
 }
 
-// الصور التجريبية
-sampleImages.forEach(img => {
-    img.addEventListener('click', () => {
-        // محاكاة تحميل صورة تجريبية
-        originalImage.src = img.src;
-        imageContainer.style.display = 'block';
+function updateFileInfo(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    
+    if (currentFileType === 'video') {
+        videoDuration.style.display = 'flex';
+    } else {
+        videoDuration.style.display = 'none';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 بايت';
+    const k = 1024;
+    const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// الملفات التجريبية
+sampleItems.forEach(item => {
+    item.addEventListener('click', () => {
+        const sampleType = item.dataset.type;
+        if (sampleType !== currentFileType) {
+            showNotification(`يرجى التبديل إلى تبويب ${sampleType === 'image' ? 'الصور' : 'الفيديوهات'} أولاً`, 'warning');
+            return;
+        }
+        
+        if (currentFileType === 'image') {
+            originalImage.src = item.src;
+            originalImage.style.display = 'block';
+            originalVideo.style.display = 'none';
+        }
+        
+        fileContainer.style.display = 'block';
         comparisonContainer.style.display = 'none';
         
-        // إنشاء ملف وهمي للصورة التجريبية
-        fetch(img.src)
+        // إنشاء ملف وهمي
+        fetch(item.src)
             .then(res => res.blob())
             .then(blob => {
-                currentImageFile = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
-                showNotification('تم تحميل الصورة التجريبية!', 'success');
+                currentFile = new File([blob], 'sample.jpg', { type: 'image/jpeg' });
+                updateFileInfo(currentFile);
+                showNotification('تم تحميل الملف التجريبي!', 'success');
             })
             .catch(() => {
-                showNotification('حدث خطأ في تحميل الصورة التجريبية', 'error');
+                showNotification('حدث خطأ في تحميل الملف التجريبي', 'error');
             });
     });
 });
 
-// إزالة الخلفية باستخدام API حقيقي
+// إزالة الخلفية
 removeBtn.addEventListener('click', async () => {
-    if (!currentImageFile) return;
+    if (!currentFile) return;
 
     // إظهار شاشة التحميل
     loading.style.display = 'block';
     removeBtn.disabled = true;
-    imageContainer.style.display = 'none';
+    fileContainer.style.display = 'none';
+    
+    // إعادة تعيين شريط التقدم
+    progressFill.style.width = '0%';
+    progressText.textContent = '0%';
 
     try {
-        await processImageWithRealAPI();
+        if (currentFileType === 'image') {
+            await processImageWithRealAPI();
+        } else {
+            await processVideoLocally();
+        }
     } catch (error) {
-        console.error('خطأ في معالجة الصورة:', error);
-        showNotification('حدث خطأ أثناء معالجة الصورة. يرجى المحاولة مرة أخرى.', 'error');
+        console.error('خطأ في معالجة الملف:', error);
+        showNotification(`حدث خطأ أثناء معالجة ${currentFileType === 'image' ? 'الصورة' : 'الفيديو'}. يرجى المحاولة مرة أخرى.`, 'error');
         loading.style.display = 'none';
-        imageContainer.style.display = 'block';
+        fileContainer.style.display = 'block';
         removeBtn.disabled = false;
     }
 });
 
 async function processImageWithRealAPI() {
     try {
+        // محاكاة التقدم
+        simulateProgress();
+        
         // إنشاء FormData لإرسال الصورة
         const formData = new FormData();
-        formData.append('image_file', currentImageFile);
+        formData.append('image_file', currentFile);
         formData.append('size', 'auto');
 
         // إرسال الطلب إلى API
@@ -155,7 +298,7 @@ async function processImageWithRealAPI() {
 
         // الحصول على البيانات كـ blob
         const blob = await response.blob();
-        processedImageData = blob;
+        processedFileData = blob;
         
         // إنشاء URL للصورة المعالجة
         const processedUrl = URL.createObjectURL(blob);
@@ -163,6 +306,9 @@ async function processImageWithRealAPI() {
         // إظهار المقارنة
         beforeImage.src = originalImage.src;
         afterImage.src = processedUrl;
+        
+        imageComparison.style.display = 'block';
+        videoComparison.style.display = 'none';
         
         loading.style.display = 'none';
         comparisonContainer.style.display = 'block';
@@ -221,12 +367,15 @@ async function processImageLocally() {
                 
                 // تحويل إلى blob
                 canvas.toBlob((blob) => {
-                    processedImageData = blob;
+                    processedFileData = blob;
                     const processedUrl = URL.createObjectURL(blob);
                     
                     // إظهار المقارنة
                     beforeImage.src = originalImage.src;
                     afterImage.src = processedUrl;
+                    
+                    imageComparison.style.display = 'block';
+                    videoComparison.style.display = 'none';
                     
                     loading.style.display = 'none';
                     comparisonContainer.style.display = 'block';
@@ -238,27 +387,75 @@ async function processImageLocally() {
             };
             
             img.src = originalImage.src;
-        }, 2000); // محاكاة وقت المعالجة
+        }, 2000);
     });
 }
 
-// صورة جديدة
-newImageBtn.addEventListener('click', () => {
+async function processVideoLocally() {
+    return new Promise((resolve) => {
+        // محاكاة معالجة الفيديو
+        simulateProgress();
+        
+        setTimeout(() => {
+            // في التطبيق الحقيقي، ستتم معالجة الفيديو إطار بإطار
+            // هنا نقوم بمحاكاة النتيجة
+            
+            processedFileData = currentFile; // مؤقتاً نستخدم الفيديو الأصلي
+            
+            // إظهار المقارنة
+            beforeVideo.src = originalVideo.src;
+            afterVideo.src = originalVideo.src; // مؤقتاً نستخدم نفس الفيديو
+            
+            imageComparison.style.display = 'none';
+            videoComparison.style.display = 'block';
+            
+            loading.style.display = 'none';
+            comparisonContainer.style.display = 'block';
+            removeBtn.disabled = false;
+            
+            showNotification('تم معالجة الفيديو! (نسخة تجريبية)', 'success');
+            resolve();
+        }, 5000);
+    });
+}
+
+function simulateProgress() {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 95) progress = 95;
+        
+        progressFill.style.width = progress + '%';
+        progressText.textContent = Math.round(progress) + '%';
+        
+        if (progress >= 95) {
+            clearInterval(interval);
+        }
+    }, 200);
+}
+
+// ملف جديد
+newFileBtn.addEventListener('click', () => {
     resetApplication();
-    showNotification('جاهز لصورة جديدة!', 'success');
+    showNotification(`جاهز لـ${currentFileType === 'image' ? 'صورة' : 'فيديو'} جديد!`, 'success');
 });
 
 function resetApplication() {
-    imageContainer.style.display = 'none';
+    fileContainer.style.display = 'none';
     comparisonContainer.style.display = 'none';
     loading.style.display = 'none';
     fileInput.value = '';
-    currentImageFile = null;
-    processedImageData = null;
+    currentFile = null;
+    processedFileData = null;
     
     // إعادة تعيين شريط المقارنة
     sliderHandle.style.left = '50%';
     afterImage.style.clipPath = 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)';
+    afterVideo.style.clipPath = 'polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%)';
+    
+    // إعادة تعيين شريط التقدم
+    progressFill.style.width = '0%';
+    progressText.textContent = '0%';
 }
 
 // شريط المقارنة التفاعلي
@@ -286,20 +483,28 @@ function doResize(e) {
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
     
     sliderHandle.style.left = percentage + '%';
-    afterImage.style.clipPath = `polygon(${percentage}% 0%, 100% 0%, 100% 100%, ${percentage}% 100%)`;
+    
+    if (currentFileType === 'image') {
+        afterImage.style.clipPath = `polygon(${percentage}% 0%, 100% 0%, 100% 100%, ${percentage}% 100%)`;
+    } else {
+        afterVideo.style.clipPath = `polygon(${percentage}% 0%, 100% 0%, 100% 100%, ${percentage}% 100%)`;
+    }
 }
 
 function stopResize() {
     isResizing = false;
 }
 
-// تحميل الصورة الناتجة
+// تحميل الملف الناتج
 downloadBtn.addEventListener('click', () => {
-    if (!processedImageData) return;
+    if (!processedFileData) return;
     
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(processedImageData);
-    link.download = `removed-background-${Date.now()}.png`;
+    link.href = URL.createObjectURL(processedFileData);
+    
+    const extension = currentFileType === 'image' ? 'png' : 'mp4';
+    const prefix = currentFileType === 'image' ? 'removed-background' : 'processed-video';
+    link.download = `${prefix}-${Date.now()}.${extension}`;
     link.click();
     
     // تأثير بصري للتحميل
@@ -314,7 +519,7 @@ downloadBtn.addEventListener('click', () => {
         downloadBtn.style.borderColor = '';
     }, 2000);
     
-    showNotification('تم تحميل الصورة بنجاح!', 'success');
+    showNotification(`تم تحميل ${currentFileType === 'image' ? 'الصورة' : 'الفيديو'} بنجاح!`, 'success');
 });
 
 // نظام الإشعارات
@@ -343,7 +548,8 @@ function showNotification(message, type = 'info') {
         fontSize: '14px',
         fontWeight: '600',
         transform: 'translateX(100%)',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        maxWidth: '350px'
     });
     
     document.body.appendChild(notification);
@@ -353,13 +559,15 @@ function showNotification(message, type = 'info') {
         notification.style.transform = 'translateX(0)';
     }, 100);
     
-    // إزالة الإشعار بعد 3 ثوان
+    // إزالة الإشعار بعد 4 ثوان
     setTimeout(() => {
         notification.style.transform = 'translateX(100%)';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
         }, 300);
-    }, 3000);
+    }, 4000);
 }
 
 function getNotificationIcon(type) {
@@ -391,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // تأثيرات التحميل
-    const elements = document.querySelectorAll('.feature-card, .sample-image');
+    const elements = document.querySelectorAll('.feature-card, .sample-item');
     elements.forEach((el, index) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -402,7 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, index * 100);
     });
     
-    showNotification('مرحباً بك في Remove Images Background! 🎉', 'success');
+    // تهيئة واجهة المستخدم للصور (افتراضي)
+    updateUIForFileType('image');
+    
+    showNotification('مرحباً بك في Remove Images & Videos Background! 🎉', 'success');
 });
 
 // معالجة الأخطاء العامة

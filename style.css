@@ -107,7 +107,7 @@ body {
 }
 
 .logo-text {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
     -webkit-background-clip: text;
@@ -168,6 +168,46 @@ body {
     margin-bottom: 30px;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+}
+
+/* تبويبات نوع الملف */
+.file-type-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: var(--shadow);
+}
+
+.tab-btn i {
+    font-size: 18px;
 }
 
 .upload-area {
@@ -243,7 +283,7 @@ body {
     display: none;
 }
 
-.image-container {
+.file-container {
     display: none;
     margin-top: 30px;
     animation: fadeIn 0.5s ease;
@@ -254,7 +294,7 @@ body {
     to { opacity: 1; }
 }
 
-.image-preview {
+.file-preview {
     position: relative;
     border-radius: 15px;
     overflow: hidden;
@@ -262,11 +302,35 @@ body {
     margin-bottom: 20px;
 }
 
-.image-preview img {
+.file-preview img,
+.file-preview video {
     width: 100%;
     height: auto;
     display: block;
     transition: all 0.3s ease;
+}
+
+.file-info {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-light);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.info-item i {
+    color: var(--primary);
 }
 
 .comparison-container {
@@ -294,13 +358,21 @@ body {
     box-shadow: var(--shadow);
 }
 
-.comparison-images {
+.comparison-content {
     position: relative;
     width: 100%;
     height: 400px;
 }
 
-.comparison-images img {
+.comparison-images,
+.comparison-videos {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.comparison-images img,
+.comparison-videos video {
     position: absolute;
     top: 0;
     left: 0;
@@ -309,7 +381,8 @@ body {
     object-fit: cover;
 }
 
-.after-image {
+.after-image,
+.after-video {
     clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
     transition: clip-path 0.3s ease;
 }
@@ -453,6 +526,31 @@ body {
 .loading-text {
     font-size: 1.1rem;
     color: var(--text-gray);
+    margin-bottom: 15px;
+}
+
+.progress-bar {
+    width: 100%;
+    max-width: 300px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 0 auto 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    color: var(--text-gray);
+    font-weight: 600;
 }
 
 @keyframes spin {
@@ -505,7 +603,7 @@ body {
     line-height: 1.6;
 }
 
-.sample-images {
+.sample-files {
     margin-top: 30px;
     text-align: center;
 }
@@ -524,7 +622,7 @@ body {
     flex-wrap: wrap;
 }
 
-.sample-image {
+.sample-item {
     width: 80px;
     height: 80px;
     border-radius: 10px;
@@ -535,7 +633,7 @@ body {
     border: 3px solid transparent;
 }
 
-.sample-image:hover {
+.sample-item:hover {
     transform: scale(1.1) rotate(2deg);
     box-shadow: var(--shadow-lg);
     border-color: var(--primary);
@@ -611,7 +709,7 @@ body {
     }
 
     .logo-text {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .upload-area {
@@ -634,7 +732,7 @@ body {
         height: 40px;
     }
 
-    .comparison-images {
+    .comparison-content {
         height: 250px;
     }
 
@@ -651,6 +749,22 @@ body {
     .designer-credit {
         font-size: 0.85rem;
         padding: 6px 12px;
+    }
+
+    .file-type-tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tab-btn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+
+    .file-info {
+        flex-direction: column;
+        align-items: center;
     }
 }
 
@@ -676,4 +790,18 @@ body {
 
 .dark-mode .footer {
     border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .tab-btn {
+    border-color: var(--border);
+    color: var(--text-gray);
+}
+
+.dark-mode .tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.dark-mode .info-item {
+    background: var(--border);
 }
