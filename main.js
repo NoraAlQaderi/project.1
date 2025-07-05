@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, index * 100);
     });
     
-    showNotification('مرحباً بك في Remove AI! 🎉', 'success');
+    showNotification('مرحباً بك في Remove Images Background! 🎉', 'success');
 });
 
 // معالجة الأخطاء العامة
